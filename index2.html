@@ -1,0 +1,134 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+
+<html>
+        <!--
+         Copyright (c) 2022 Sekou Remy
+         
+         Permission is hereby granted, free of charge, to any person obtaining a copy
+         of this software and associated documentation files (the "Software"), to deal
+         in the Software without restriction, including without limitation the rights
+         to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+         copies of the Software, and to permit persons to whom the Software is
+         furnished to do so, subject to the following conditions:
+         
+         The above copyright notice and this permission notice shall be included in
+         all copies or substantial portions of the Software.
+         
+         THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+         IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+         FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+         AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+         LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+         OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+         THE SOFTWARE.
+        -->
+        <head>
+                <meta charset="UTF-8">
+                <style>
+                        body {
+                                margin: 0px;
+                                padding: 0px;
+                        }
+                        </style>
+                        <script>
+                                var base_url = window.location.href
+                                base_url = base_url.substring(0, base_url.lastIndexOf("/"));
+			</script>
+        </head>
+        <body>
+                <canvas id="myCanvas" width="100" height="100"></canvas>
+                <script>
+                        var L = document.getElementById('myCanvas').width;
+                        var H = document.getElementById('myCanvas').height;
+			var counter = 0;
+                        function getstate(url)
+                        {
+                                var req = new XMLHttpRequest();
+                                var data=[];
+                                var now = new Date();
+                                req.open("GET", url, false); 
+                                req.send(null);
+                                if(req.status == 200) {
+                                        data=req.response.split(" ");
+                                }else{
+                                        data[0]=0;
+                                        data[1]=0
+                                }
+                                return data
+                        }
+                </script>
+
+                <br>
+                <button type="button"  onclick="playpause()"> Audio Play/Pause </button>
+                <script>
+                        var pressed = false
+                        window.AudioContext = window.AudioContext || window.webkitAudioContext;
+			var soundcontext = new AudioContext();
+                        var osc = soundcontext.createOscillator();
+                        osc.connect(soundcontext.destination);
+                        osc.frequency.value = 100;
+
+                        function playpause() {
+                          if (pressed) {
+                            osc.stop(0);
+                            pressed=false;
+                          } else {
+                            osc.start(0);
+                            pressed=true;
+                          }
+                        }
+                </script>
+
+                <script>
+                        var canvas = document.getElementById('myCanvas');
+                        var context = canvas.getContext('2d');
+
+                        var isFocus = 1;
+                        var FPS = 12;
+
+                        window.onblur = function() {
+                                isFocus = 0.5; /// reduce FPS to half
+                        }
+
+                        window.onfocus = function() {
+                                isFocus = 1; /// full FPS
+                        }
+                        function drawmotor() {
+                                setTimeout(drawmotor, 1000 / (isFocus * FPS)); 
+                                var data=getstate(base_url+"/state?");
+				if (counter++ % 6 == 0){
+				    osc.frequency.value = 1640/500*Math.abs(data[1]) + 100;
+				}
+				console.log(osc.frequency.value)
+				context.clearRect(0, 0, L, H);
+                                context.fillStyle = "#444444";
+                                context.save();
+                                context.translate(50,50);
+                                context.rotate(data[0]/100);
+                                context.fillRect(-15, -15, 30, 30);
+                                context.restore();
+                                // requestAnimationFrame(drawmotor);
+                        }
+                        // requestAnimationFrame(drawmotor);
+                        drawmotor();
+
+                </script>
+		<br>
+		<label for="fader">Voltage</label>
+		<input type="range" min="-14" max="14" value="0" id="fader" 
+			step="1" >
+		<output for="fader" id="voltage">0</output>
+		<script>
+			var voltage = document.getElementById("voltage");
+			var slider = document.getElementById("fader");
+			voltage.innerHTML = fader.value;
+
+			slider.oninput = function() {
+				getstate(base_url+"/u?value0="+this.value+"&time=0")
+  				voltage.innerHTML = this.value;
+			} 
+		</script>
+		                <br>
+                <button type="button"  onclick="navigator.clipboard.writeText(base_url)"> Copy base to clipboard </button>
+        </body>
+</html>

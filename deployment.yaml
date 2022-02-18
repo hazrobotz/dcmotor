@@ -1,0 +1,27 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: dcmotor
+spec:
+  selector:
+    matchLabels:
+      app: dcmotor
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: dcmotor
+    spec:
+      containers:
+        - name: dcmotor
+          image: dcmotor
+          imagePullPolicy: Never
+          env:
+          - name: PORT 
+            value: "8000"
+          - name: NUM_PLANTS 
+            value: "2"
+          - name: SAMPLE_PERIOD 
+            value: ".02"
+          ports:
+            - containerPort: 1234

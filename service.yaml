@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: dcmotor-service
+spec:
+  ports:
+    - protocol: "TCP"
+      port: 8000        # The port inside the cluster
+      targetPort: 8000  # The port exposed by the service
+  type: NodePort        # Type of service
+  selector:
+    app: dcmotor
