@@ -1,7 +1,7 @@
 # temp stage
 FROM python:3.9 as builder
 
-COPY webservice.py plant.py index2.html requirements.txt /app/
+COPY requirements.txt code /app/
 
 WORKDIR /app
 RUN pip wheel --no-cache-dir --no-deps --wheel-dir /wheels -r requirements.txt
