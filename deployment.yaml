@@ -14,13 +14,13 @@ spec:
     spec:
       containers:
         - name: dcmotor
-          image: dcmotor
-          imagePullPolicy: Never
+          image: ghcr.io/hazrobotz/dcmotor:main
+          imagePullPolicy: IfNotPresent
           env:
           - name: PORT 
             value: "8000"
           - name: NUM_PLANTS 
-            value: "2"
+            value: "4"
           - name: SAMPLE_PERIOD 
             value: ".02"
           ports:
